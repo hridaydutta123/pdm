@@ -13,7 +13,9 @@ import android.util.Log;
 
 import com.disarm.sanna.pdm.SelectCategoryActivity;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class ApManager {
 
@@ -40,11 +42,14 @@ public class ApManager {
             if(isApOn(context)) {
                 wifimanager.setWifiEnabled(false);
             }
+
             //Change Name of the Created Hotspot
             try {
                 Method getConfigMethod = wifimanager.getClass().getMethod("getWifiApConfiguration");
 
                 WifiConfiguration wifiConfig = (WifiConfiguration) getConfigMethod.invoke(wifimanager);
+                Log.v("ApManager:", "Wifi Ap Config:" + Arrays.deepToString(wifiConfig.getClass().getFields()));
+
                 //wifiConfig.getClass().getField("apChannel").setInt(wifiConfig, 6);
                 Log.v("ApManager", "Best Available Channel:" + MyService.bestAvailableChannel);
 
@@ -62,6 +67,8 @@ public class ApManager {
                 wifiConfig.allowedKeyManagement.clear();
                 wifiConfig.allowedPairwiseCiphers.clear();
                 wifiConfig.allowedProtocols.clear();
+
+                // Create AP with SSID Name DH - <SOURCE> with preSharedKey
                 wifiConfig.SSID = "DH-" + SelectCategoryActivity.SOURCE_PHONE_NO;
 
 
@@ -74,12 +81,13 @@ public class ApManager {
 
                 Method setWifiApMethod = wifimanager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
                 boolean apstatus = (Boolean) setWifiApMethod.invoke(wifimanager, wifiConfig, true);
-                //Log.v("GetAPCOnfig:" + getConfigMethod.toString() + ",setWifiApMethod : " + setWifiApMethod.toString());
-                Log.v("WifiConfig: " , wifiConfig.toString());
+                //Log.v("WifiConfig: " , wifiConfig.toString());
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
+
+            // Enable the AP state
             Method method = wifimanager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
             method.invoke(wifimanager, wificonfiguration, !isApOn(context));
             return true;

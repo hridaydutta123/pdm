@@ -157,15 +157,17 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         if (view.getId() == R.id.submitButton){
             final String phoneTextVal = phoneText1.getText().toString();
-
-            if(phoneTextVal.length() == 10 && phoneTextVal.matches("^[789]\\d{9}$")) {
+            PrefUtils.saveToPrefs(this, SettingsConstants.PHONE_NO, phoneTextVal);
+            callWriteSettingActivity();
+           
+           /* if(phoneTextVal.length() == 10 && phoneTextVal.matches("^[789]\\d{9}$")) {
                 PrefUtils.saveToPrefs(this, SettingsConstants.PHONE_NO, phoneTextVal);
                 callWriteSettingActivity();
             }
             else
             {
                 phoneText1.setError("Enter Valid Number");
-            }
+            }*/
         }
     }
 

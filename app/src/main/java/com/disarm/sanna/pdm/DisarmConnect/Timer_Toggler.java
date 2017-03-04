@@ -50,7 +50,12 @@ public class Timer_Toggler implements Runnable{
         MyService.count++;
         List<ScanResult> allScanResults = MyService.wifi.getScanResults();
 
+        // Check AP is enabled or Wifi is enabled
+
         if (MyService.checkWifiState.equals("<unknown ssid>")) {
+            /*
+                Hotspot Mode Detected
+            */
             Log.v(MyService.TAG1, "Hotspot Mode Detected");
             Logger.addRecordToLog("Hotspot Mode Detected");
             boolean isReachable = false;
@@ -61,6 +66,8 @@ public class Timer_Toggler implements Runnable{
                 String line;
                 IpAddr = new ArrayList<String>();
                 MyService.c = false;
+
+                // Find no. of connected clients
                 while ((line = br.readLine()) != null) {
                     String[] splitted = line.split(" +");
 
@@ -121,32 +128,38 @@ public class Timer_Toggler implements Runnable{
 
         } //if Completed check
 
-        else if(MyService.checkWifiState.contains("DisarmHotspotDB")) {
+        else if(MyService.checkWifiState.contains(MyService.dbAPName)) {
+            /*
+                Connected to DB
+             */
             Log.v(MyService.TAG1, "DisarmHotspotDB Not Toggling");
         //    MainActivity.textConnect.setText("DB Connected");
 
         }
         else if (MyService.checkWifiState.contains("DH-")) {
-            /////////////////////////
-           // this.handler.post(searchingDisarmDB);
+            /*
+                Connected to DH
+             */
             String connectedText = MyService.checkWifiState + " connected";
-//            MainActivity.textConnect.setText(connectedText);
-            Log.v(MyService.TAG1, "DisarmHotspot Not Toggling");
+
+            Log.v(MyService.TAG1, "DH Not Toggling");
             Log.v(MyService.TAG1,"Trying to find better DH");
-            //Logger.addRecordToLog("Connected to DH");
+
             // Trying to search for better DH
             findBetterDHAvailable(allScanResults);
         }
 
         else
         {
+            // Start the toggle function
             Toggler.toggle(context);
         }
         boolean apOn = ApManager.isApOn(context);
         if(apOn){
-
+            // Increase the hotspot counter
             this.handler.postDelayed(this,Toggler.addIncreasehp);
         }else{
+            // Increase the wifi counter
             this.handler.postDelayed(this,Toggler.addIncreasewifi);
         }
     }
@@ -163,8 +176,9 @@ public class Timer_Toggler implements Runnable{
             }
         }
 
-        Log.v("AllDH Available:", Arrays.asList(allDHAvailable).toString());
+       // Log.v("AllDH Available:", Arrays.asList(allDHAvailable).toString());
         Logger.addRecordToLog("All DH available:" + Arrays.asList(allDHAvailable).toString());
+
         // Find key with the maximum value from allDHAvailable
         String bestFoundSSID="";
         int maxValueInMap = 0;
@@ -174,7 +188,7 @@ public class Timer_Toggler implements Runnable{
             while (it.hasNext()) {
                 Map.Entry<String, Integer> pair = (Map.Entry) it.next();
                 if (pair.getValue() == maxValueInMap) {
-                    Log.v("Best Found SSID:", pair.getKey());     // Print the key with max value
+                //    Log.v("Best Found SSID:", pair.getKey());     // Print the key with max value
                     Logger.addRecordToLog("Best Found SSID"+ ',' + pair.getKey());
                     bestFoundSSID = pair.getKey().toString();
                 }
@@ -188,7 +202,7 @@ public class Timer_Toggler implements Runnable{
         wc.SSID = "\"" + bestFoundSSID + "\""; //IMPORTANT! This should be in Quotes!!
         wc.preSharedKey = "\""+ pass +"\"";
         wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-        //wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
         int res = MyService.wifi.addNetwork(wc);
         boolean b = MyService.wifi.enableNetwork(res, true);
         Log.v(MyService.TAG2, "Connected");

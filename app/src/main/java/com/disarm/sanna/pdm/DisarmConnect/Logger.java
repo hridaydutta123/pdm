@@ -83,31 +83,7 @@ public class Logger {
             }
             catch (Exception e)
             {}
-            /*try {
-                Log.v("log file check :", logFile.toString());
-                FileWriter buf = new FileWriter(logFile, true);
-                df = new SimpleDateFormat("yyyyMMddHHmmss");
-                date = df.format(Calendar.getInstance().getTime());
-                buf.write(message+','+date +"\r\n");
 
-                buf.flush();
-                buf.close();
-
-
-                logFileUpdated = logFile.toString().substring(0, logFile.toString().length()-19);
-
-                Log.v("Phone ID: ", phoneID);
-                Log.v("Log File:",logFile.toString());
-                File to = new File(logFileUpdated.toString() + "_" + date + ".txt");
-                Log.v("Log File Updated:",logFileUpdated.toString()+ "_" + date + ".txt");
-
-                boolean success = logFile.renameTo(to);
-
-                Log.v("Success:",String.valueOf(success));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }*/
         }
     }
 }

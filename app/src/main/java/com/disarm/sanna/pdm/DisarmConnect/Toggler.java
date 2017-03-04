@@ -100,12 +100,6 @@ public class Toggler extends Activity{
             return  6;
         if(channelArray[11] < channelArray[0] && channelArray[11] < channelArray[6])
             return 11;
-        //Log.v("Minimum Channel Value,Best Found Channel:", String.valueOf(small) + "," + String.valueOf(bestFoundChannel));
-        // Find a random available channel from best found available channels
-      /*  Random rand = new Random();
-        Integer randGeneratedBestFoundChannel = (Integer) bestFoundAvailableChannels.get(rand.nextInt(bestFoundAvailableChannels.size())) + 1;
-        Log.v("Generated Random Available Channel:" ,randGeneratedBestFoundChannel.toString());
-        *///return (randGeneratedBestFoundChannel + 1);
 
         return 1;
 

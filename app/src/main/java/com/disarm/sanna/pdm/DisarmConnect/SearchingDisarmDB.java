@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static com.disarm.sanna.pdm.DisarmConnect.MyService.dbAPName;
 import static com.disarm.sanna.pdm.DisarmConnect.MyService.wifiInfo;
 
 /**
@@ -20,7 +21,7 @@ public class SearchingDisarmDB implements Runnable {
     private Context context;
     private int timerDBSearch = 3000;
     public int minDBLevel = 2;
-
+    private String ssid;
     public String connectedSSID = MyService.wifi.getConnectionInfo().getSSID().toString().replace("\"","");
     public String lastConnectedSSID = connectedSSID;
 
@@ -37,7 +38,6 @@ public class SearchingDisarmDB implements Runnable {
     {
         connectedSSID = MyService.wifi.getConnectionInfo().getSSID().toString().replace("\"","");
         lastConnectedSSID.replace("\"","");
-        Log.v("ConnectedSSID:",connectedSSID);
         if(lastConnectedSSID.startsWith("DH-") && !(lastConnectedSSID.equals(connectedSSID)))
         {
             Log.v("Disconnected DH:",lastConnectedSSID);
@@ -74,17 +74,30 @@ public class SearchingDisarmDB implements Runnable {
                     }
                 }
             }
-            else {
+            else if(!connectedSSID.contains("DB"))
+            {
                 Log.v(MyService.TAG4, "Connecting DisarmDB");
 
+                MyService.wifi.disconnect();
+
+
               //  handler.removeCallbacksAndMessages(null); !-- Dont use it all other handler will be closed
-                String ssid = MyService.dbAPName;
+                for (int i = 0 ; i < allScanResults.size(); i++)
+                {
+                    if(allScanResults.get(i).SSID.contains("DB")) {
+                        ssid = allScanResults.get(i).SSID;
+                        break;
+                    }
+                }
                 WifiConfiguration wc = new WifiConfiguration();
                 wc.SSID = "\"" + ssid + "\""; //IMPORTANT! This should be in Quotes!!
                // wc.preSharedKey = "\""+ MyService.dbPass +"\"";
                 //wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
 
                 wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
+
+
 
                 int res = MyService.wifi.addNetwork(wc);
                 boolean b = MyService.wifi.enableNetwork(res, true);
@@ -100,9 +113,8 @@ public class SearchingDisarmDB implements Runnable {
     public int findDBSignalLevel(List<ScanResult> allScanResults)
     {
         for (ScanResult scanResult : allScanResults) {
-            if(scanResult.SSID.toString().equals(MyService.dbAPName)) {
-                Log.v("SSID:",scanResult.SSID.toString());
-                int level =  WifiManager.calculateSignalLevel(scanResult.level, 5);
+            if(scanResult.SSID.toString().contains(MyService.dbAPName)) {
+               int level =  WifiManager.calculateSignalLevel(scanResult.level, 5);
                 return level;
             }
         }
